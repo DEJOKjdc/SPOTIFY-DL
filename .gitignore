@@ -1,0 +1,39 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+
+# Node / React
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+.cache/
+
+# Environment / Config
+.env
+*.env
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Data / Models
+models/*.h5
+models/*.keras
+models/*.pkl
+*.csv
+*.json
+*.joblib
+
+# Ignore Jupyter checkpoints
+.ipynb_checkpoints/
+
+# OS junk
+*.log
+*.tmp

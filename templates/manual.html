@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual Input - Popularity Predictor</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body { font-family: 'Inter', sans-serif; }
+</style>
+</head>
+<body class="bg-gray-50 min-h-screen p-4 sm:p-8">
+
+<div class="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-6 sm:p-10">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-extrabold text-indigo-700">🔮 Manual Feature Input</h1>
+    <a href="/search" class="text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg text-sm px-4 py-2 transition duration-150 shadow-md">
+      Go to Search by Track
+    </a>
+  </div>
+
+  <!-- Manual Feature Form -->
+  <form method="post" action="/manual" class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-indigo-50 rounded-lg shadow-inner mb-10">
+    {% for col in feature_columns %}
+    <div class="flex flex-col">
+      <label for="{{ col }}" class="text-sm font-semibold text-gray-700 mb-1">{{ col | replace("_", " ") | title }}:</label>
+      <input type="number" step="any" id="{{ col }}" name="{{ col }}" value="{{ request.form[col] if request.form[col] is not none else '0' }}" 
+             class="px-4 py-2 border border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
+    </div>
+    {% endfor %}
+    <div class="md:col-span-2 pt-4">
+      <button type="submit" class="w-full text-white bg-indigo-600 hover:bg-indigo-700 font-bold py-3 rounded-lg shadow-lg transform hover:scale-[1.01] transition duration-200">
+        Predict Popularity & Get Recommendations
+      </button>
+    </div>
+  </form>
+
+  <!-- Results Section -->
+  {% if result %}
+    {% if result['error'] %}
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mb-6">
+        <strong class="font-bold">Error:</strong>
+        <span class="block sm:inline">{{ result['error'] }}</span>
+      </div>
+    {% else %}
+      <h2 class="text-2xl font-bold text-gray-800 border-b pb-2 mb-4">Prediction Results</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        {% for key, value in result['prediction'].items() %}
+        <div class="bg-blue-50 p-4 rounded-xl shadow-md text-center">
+          <p class="text-xs text-blue-600 uppercase font-bold">{{ key | replace("_", " ") | title }}</p>
+          <p class="text-3xl font-extrabold text-blue-900 mt-1">{{ value | round(2) }}</p>
+        </div>
+        {% endfor %}
+      </div>
+
+      <h2 class="text-2xl font-bold text-gray-800 border-b pb-2 mb-4">Top 5 Recommendations</h2>
+      <ul class="space-y-3">
+        {% for rec in result['recommendations'] %}
+        <li class="p-4 bg-gray-100 rounded-xl shadow-sm hover:shadow-md transition duration-150 flex justify-between items-center">
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+              <p class="font-semibold text-lg text-gray-900">{{ rec['track_name'] }}</p>
+              <p class="text-sm text-gray-600">by {{ rec['artists'] }}</p>
+              {% if rec['youtube_link'] %}
+              <a href="{{ rec['youtube_link'] }}" target="_blank" class="text-blue-600 hover:underline text-sm">🎵 Watch on YouTube</a>
+              {% endif %}
+            </div>
+            <span class="text-xl font-bold text-green-700 bg-green-200 px-3 py-1 rounded-full">
+              {{ rec['predicted_popularity'] | round(2) }}
+            </span>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endif %}
+</div>
+
+</body>
+</html>
